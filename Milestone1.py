@@ -4,7 +4,7 @@ import yaml
 import time
 from datetime import datetime
 
-logFile = open("logFile.txt", "w")
+logFile = open("logFile1B.txt", "w")
 
 def time_function(function_name, sleep_time,fun_name):
     print((str(datetime.now())+";" + function_name + " Executing TimeFunction("+ fun_name +","+str(sleep_time)+")"))

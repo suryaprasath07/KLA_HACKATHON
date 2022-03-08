@@ -5,7 +5,7 @@ import time
 import csv
 from datetime import datetime
 
-logFile = open("logFile.txt", "w")
+logFile = open("logFile2B.txt", "w")
 count_dit = 0
 
 def time_function(function_name, sleep_time,fun_name):
@@ -185,7 +185,7 @@ def conc_activities(flowname,data):
         logFile.write(str(datetime.now()) + ";" + flow + " Exit\n")
 
 if __name__=="__main__":
-    with open("Milestone2A.yaml", "r") as file:
+    with open("Milestone2B.yaml", "r") as file:
         try:
             yamlData = yaml.safe_load(file)
             task_name = list(yamlData.keys())[0]

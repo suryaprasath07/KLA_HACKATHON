@@ -5,27 +5,26 @@ import time
 import csv
 from datetime import datetime
 
-logFile = open("logFile.txt", "w")
+logFile = open("logFile2.txt", "w")
 count_dit = dict()
 
 def time_function(function_name, sleep_time,fun_name):
-    if fun_name[0] != '$':
-        print((str(datetime.now()) + ";" + function_name + " Executing TimeFunction(" + fun_name + "," + str(
+    print((str(datetime.now()) + ";" + function_name + " Executing TimeFunction(" + fun_name + "," + str(
             sleep_time) + ")"))
-        logFile.write((str(datetime.now()) + ";" + function_name + " Executing TimeFunction(" + fun_name + "," + str(
-            sleep_time) + ")\n"))
-        time.sleep(sleep_time)
-        logFile.write(str(datetime.now()) + ";" + function_name + " Exit\n")
-    else:
-        key = fun_name[2:-1]
-        while key not in count_dit:
-            pass
-        print((str(datetime.now()) + ";" + function_name + " Executing TimeFunction(" + str(count_dit[key]) + "," + str(
-            sleep_time) + ")"))
-        logFile.write((str(datetime.now()) + ";" + function_name + " Executing TimeFunction(" + str(count_dit[key]) + "," + str(
-            sleep_time) + ")\n"))
-        time.sleep(sleep_time)
-        logFile.write(str(datetime.now()) + ";" + function_name + " Exit\n")
+    logFile.write((str(datetime.now()) + ";" + function_name + " Executing TimeFunction(" + fun_name + "," + str(
+    sleep_time) + ")\n"))
+    time.sleep(sleep_time)
+    logFile.write(str(datetime.now()) + ";" + function_name + " Exit\n")
+    # # else:
+    #     key = fun_name[2:-1]
+    #     while key not in count_dit:
+    #         pass
+    #     print((str(datetime.now()) + ";" + function_name + " Executing TimeFunction(" + str(count_dit[key]) + "," + str(
+    #         sleep_time) + ")"))
+    #     logFile.write((str(datetime.now()) + ";" + function_name + " Executing TimeFunction(" + str(count_dit[key]) + "," + str(
+    #         sleep_time) + ")\n"))
+    #     time.sleep(sleep_time)
+    #     logFile.write(str(datetime.now()) + ";" + function_name + " Exit\n")
 
 def data_load(function_name,File_name,fun_name=""):
     var = 0

@@ -1,20 +1,48 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import yaml
-import numpy
-import pandas
-import threading
-import csv
+import time
+from datetime import datetime
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+logFile = open("logFile.txt", "w")
+
+def time_function(function_name, sleep_time,fun_name):
+    logFile.write((str(datetime.now())+";" + function_name + " Executing TimeFunction("+ fun_name +","+str(sleep_time)+")\n"))
+    time.sleep(sleep_time)
+
+def helper(flow_name, data):
+    if data["Type"] == 'Flow':
+        if data["Execution"] == "Sequential":
+            seq_activities(flow_name, data["Activities"])
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def task_activities(flowname, functioninput, exectime):
+    sdata = flowname
+    time_function(sdata, int(exectime),functioninput)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+def seq_activities(flowname, data):
+
+    tempdata = list(data.values())
+    flowtaskname = list(data.keys())
+
+    for temp, flow in zip(tempdata, flowtaskname):
+        flowprint = flowname + "." + j
+        logFile.write(str(datetime.now()) + ";" + flowprint + " Entry\n")
+        if temp["Type"] == "Task":
+            if temp["Function"] == "TimeFunction":
+                task_activities(flowprint,temp["Inputs"]["FunctionInput"], temp["Inputs"]["ExecutionTime"])
+                logFile.write(str(datetime.now()) + ";" + flowprint + " Exit\n")
+        if temp["Type"] == "Flow":
+            helper(flowprint, temp)
+            logFile.write(str(datetime.now()) + ";" + flowprint + " Exit\n")
+
+with open("Dataset/Milestone1/Milestone1A.yaml", "r") as file:
+    try:
+        yamlData = yaml.safe_load(file)
+        task_name = list(yamlData.keys())[0]
+        task_details = list(yamlData.values())[0]
+        logFile.write(str(datetime.now()) + ";" + str(task_name) + " Entry\n")
+        helper(task_name, task_details)
+        logFile.write(str(datetime.now()) + ";" + str(task_name) + " Exit")
+        print(str(datetime.now()) + ";" + str(task_name) + " Exit")
+    except yaml.YAMLError as exc:
+        print(exc)

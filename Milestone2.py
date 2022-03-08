@@ -6,7 +6,7 @@ import csv
 from datetime import datetime
 
 logFile = open("logFile.txt", "w")
-count_dit = dict()
+count_dit = 0
 
 def time_function(function_name, sleep_time,fun_name):
     print((str(datetime.now())+";" + function_name + " Executing TimeFunction("+ fun_name +","+str(sleep_time)+")"))
@@ -25,7 +25,6 @@ def data_load(function_name,File_name,fun_name=""):
         var+=1
     logFile.write((str(datetime.now()) + ";" + function_name + " Exit\n"))
     print((str(datetime.now()) + ";" + function_name + " Exit\n"))
-    print("var : ",var)
     return var
 
 def helper(flow_name, data):
@@ -36,15 +35,17 @@ def helper(flow_name, data):
             conc_activities(flow_name,data["Activities"])
 
 def task_activities(flowname, functioninput, input1,FUNCTION):
+    global count_dit
     if(FUNCTION=="TIME_FUNCTION"):
         time_function(flowname, int(input1),functioninput)
     elif(FUNCTION=="DATA_LOAD"):
-        count_dit[flowname+".NoOfDefects"] = data_load(flowname,input1,functioninput)
+        count_dit = data_load(flowname,input1,functioninput)
         print(count_dit)
 
 def seq_activities(flowname, data):
     tempdata = list(data.values())
     flowtaskname = list(data.keys())
+    global count_dit
 
     for temp, flow in zip(tempdata, flowtaskname):
         flowprint = flowname + "." + flow
@@ -56,7 +57,8 @@ def seq_activities(flowname, data):
                     key = temp["Condition"][temp["Condition"].index("(")+1:temp["Condition"].index(")")]
                     condn = temp["Condition"].split()[-2]
                     val = int(temp["Condition"].split()[-1])
-                    res = int(count_dit[key])
+
+                    res = count_dit
                     if(condn==">" and res>val):
                         task_activities(flowprint, temp["Inputs"]["FunctionInput"], temp["Inputs"]["ExecutionTime"],
                                         "TIME_FUNCTION")
@@ -66,6 +68,7 @@ def seq_activities(flowname, data):
                     else:
                         logFile.write(str(datetime.now()) + ";" + flowprint + " Skipped\n")
                 else:
+                    print("TIME FUNCTION==>",flowprint)
                     task_activities(flowprint, temp["Inputs"]["FunctionInput"], temp["Inputs"]["ExecutionTime"],"TIME_FUNCTION")
 
             if temp["Function"] == "DataLoad":
@@ -73,7 +76,7 @@ def seq_activities(flowname, data):
                     key = temp["Condition"][temp["Condition"].index("(")+1:temp["Condition"].index(")")]
                     condn = temp["Condition"].split()[-2]
                     val = int(temp["Condition"].split()[-1])
-                    res = int(count_dit[key])
+                    res = count_dit
                     if(condn==">" and res>val):
                         task_activities(flowprint,"", temp["Inputs"]["Filename"],
                                         "DATA_LOAD")
@@ -91,13 +94,13 @@ def seq_activities(flowname, data):
             logFile.write(str(datetime.now()) + ";" + flowprint + " Exit\n")
 
 def conc_activities(flowname,data):
+    global count_dit
     tempdata = list(data.values())
     flowtaskname = list(data.keys())
     Thread_arr = []
     flow_arr = []
     Thread_flowArr = []
     dataThread_arr = []
-    dataThread_dit = {}
 
     for temp, flow in zip(tempdata, flowtaskname):
         flowprint = flowname + "." + flow
@@ -111,10 +114,9 @@ def conc_activities(flowname,data):
                     condn = temp["Condition"].split()[-2]
                     val = int(temp["Condition"].split()[-1])
 
-                    for k,val in dataThread_dit.items():
-                        dataThread_dit[k].join()
+                    print(val,count_dit)
 
-                    res = int(count_dit[key])
+                    res = count_dit
                     if (condn == ">" and res > val):
                         Thread1 = threading.Thread(target=task_activities, args=(
                             flowprint, temp["Inputs"]["FunctionInput"], temp["Inputs"]["ExecutionTime"],"TIME_FUNCTION",))
@@ -128,6 +130,7 @@ def conc_activities(flowname,data):
                         Thread_arr.append(Thread1)
                     else:
                         logFile.write(str(datetime.now()) + ";" + flowprint + " Skipped\n")
+                        logFile.write(str(datetime.now()) + ";" + flowprint + " Exit\n")
                 else:
                     Thread1 = threading.Thread(target=task_activities, args=(
                         flowprint, temp["Inputs"]["FunctionInput"], temp["Inputs"]["ExecutionTime"],"TIME_FUNCTION",))
@@ -137,32 +140,32 @@ def conc_activities(flowname,data):
             if temp["Function"] == "DataLoad":
 
                 if "Condition" in temp:
-                    print(count_dit)
                     key = temp["Condition"][temp["Condition"].index("(") + 1:temp["Condition"].index(")")]
                     condn = temp["Condition"].split()[-2]
                     val = int(temp["Condition"].split()[-1])
 
-                    res = int(count_dit[key])
+                    res = count_dit
 
                     if (condn == ">" and res > val):
                         Thread1 = threading.Thread(target=data_load, args=(
                         flowprint,temp["Inputs"]["Filename"], "",))
                         Thread1.start()
-                        dataThread_dit[flowprint+".NoOfDefects"] = Thread1
+                        Thread_arr.append(Thread1)
                         dataThread_arr.append(Thread1)
 
                     elif (condn == "<" and res < val):
                         Thread1 = threading.Thread(target=data_load, args=(
                         flowprint, temp["Inputs"]["Filename"], "",))
                         Thread1.start()
-                        dataThread_dit[flowprint + ".NoOfDefects"] = Thread1
+                        Thread_arr.append(Thread1)
                         dataThread_arr.append(Thread1)
                     else:
                         logFile.write(str(datetime.now()) + ";" + flowprint + " Skipped\n")
+                        logFile.write(str(datetime.now()) + ";" + flowprint + " Exit\n")
                 else:
                     Thread1 = threading.Thread(target=data_load, args=(flowprint, temp["Inputs"]["Filename"],))
                     Thread1.start()
-                    dataThread_dit[flowprint + ".NoOfDefects"] = Thread1
+                    Thread_arr.append(Thread1)
                     dataThread_arr.append(Thread1)
 
         if temp["Type"] == "Flow":

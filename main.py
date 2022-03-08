@@ -25,7 +25,7 @@ def seq_activities(flowname, data):
     flowtaskname = list(data.keys())
 
     for temp, flow in zip(tempdata, flowtaskname):
-        flowprint = flowname + "." + j
+        flowprint = flowname + "." + flow
         logFile.write(str(datetime.now()) + ";" + flowprint + " Entry\n")
         if temp["Type"] == "Task":
             if temp["Function"] == "TimeFunction":

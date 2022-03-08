@@ -63,20 +63,21 @@ def conc_activities(flowname,data):
 
     for thread in Thread_arr:
         thread.join()
+
     for thread,flow in zip(Thread_flowArr,flow_arr):
         thread.join()
         logFile.write(str(datetime.now()) + ";" + flow + " Exit\n")
 
-
-with open("Dataset/Milestone1/Milestone1B.yaml", "r") as file:
-    try:
-        yamlData = yaml.safe_load(file)
-        task_name = list(yamlData.keys())[0]
-        task_details = list(yamlData.values())[0]
-        logFile.write(str(datetime.now()) + ";" + str(task_name) + " Entry\n")
-        print(str(datetime.now()) + ";" + str(task_name) + " Entry")
-        helper(task_name, task_details)
-        print(str(datetime.now()) + ";" + str(task_name) + " Exit")
-        logFile.write(str(datetime.now()) + ";" + str(task_name) + " Exit")
-    except yaml.YAMLError as exc:
-        print(exc)
+if __name__=="__main__":
+    with open("Dataset/Milestone1/Milestone1B.yaml", "r") as file:
+        try:
+            yamlData = yaml.safe_load(file)
+            task_name = list(yamlData.keys())[0]
+            task_details = list(yamlData.values())[0]
+            logFile.write(str(datetime.now()) + ";" + str(task_name) + " Entry\n")
+            print(str(datetime.now()) + ";" + str(task_name) + " Entry")
+            helper(task_name, task_details)
+            print(str(datetime.now()) + ";" + str(task_name) + " Exit")
+            logFile.write(str(datetime.now()) + ";" + str(task_name) + " Exit")
+        except yaml.YAMLError as exc:
+            print(exc)
